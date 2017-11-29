@@ -87,8 +87,6 @@ class Parser
             cyk_table[1][cell_nr] << grammar[substring.to_sym] if grammar[substring.to_sym]
           end
         end
-
-        cyk_table[1][cell_nr] = cyk_table[1][cell_nr].flatten if cyk_table[1][cell_nr]
       end
 
       # Aizpilda visas rindas
