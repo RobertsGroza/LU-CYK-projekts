@@ -97,7 +97,7 @@ class Parser
             cyk_table[i][cell_nr].each do |array_1_element|
               cyk_table[row_nr - (i + 1)][cell_nr + (i + 1)].each do |array_2_element|
                 substring = array_1_element.to_s + array_2_element.to_s
-                cyk_table[row_nr][cell_nr] << grammar[substring.to_sym] if grammar[substring.to_sym]
+                cyk_table[row_nr][cell_nr] = grammar[substring.to_sym] if grammar[substring.to_sym]
               end
             end
           end
