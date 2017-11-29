@@ -1,6 +1,6 @@
 =begin
-Lai varētu izmantot CYK algoritmu, dotā gramatika tika pārveidota Čomska jeb binārajā normālformā.
-Rezultātā iegūta šāda gramatika:
+To use CYK algorhytm grammar should be converted into chomsky normal form
+Grammar:
 S -> PM | LM | YY | SM | RT | XT | RU | RZ | XU | XZ | FE
 A -> YM | EL | MS | XX
 E -> EL | MS | XX
@@ -17,15 +17,15 @@ X -> a
 Y -> b
 Z -> c
 
-Doto vārdu pārbaudes rezultāti:
-* abbabbabbacabbaaaaabbaac      - PIEDER valodai
-* acaaaaaabbaaaaaaaaaaaaaaaaaa  - NEPIEDER valodai
-* abbabbabbbbabbabbaaaaabb      - PIEDER valodai
+Examples:
+* abbabbabbacabbaaaaabbaac      - BELONGS TO grammar
+* acaaaaaabbaaaaaaaaaaaaaaaaaa  - DOES NOT BELONG TO grammar
+* abbabbabbbbabbabbaaaaabb      - BELONGS TO grammar
 =end
 class Parser
-  start_symbol = 'S'  # Sākuma simbola noteikšana
+  start_symbol = 'S'  # Start symbol
 
-  # Gramatikas saglabāšana hash struktūrā mums ērtākā formā (Izvedums ir atslēga un neterminālie simboli, no kuriem var iegūt šos izvedumus, ir vērtības)
+  # Grammar is saved in our comfortable form
   grammar = {
     :PM => [:S],
     :LM => [:S],
@@ -53,34 +53,33 @@ class Parser
     :a => [:X]
   }
 
-  # Vārda ievade
-  puts "Ievadiet vārdu:"
+  # Word input
+  puts "Enter word to check:"
   string = gets.chomp
 
   word_length = string.length
 
-  # Izveido CYK algoritmam nepieciešamo tabulu
+  # Creates neccessary table for CYK algorhytm
   cyk_table = Array.new
 
   for i in 0..(word_length - 1)
     cyk_table << Array.new(word_length - i)
   end
 
-  # CYK Algoritma izveide
+  # CYK algorhytm
   cyk_table.each_with_index do |row, row_nr|
     row.each_with_index do |cell, cell_nr|
-      # Katra tabulas rūtiņa ir masīvs
+      # Every cell is array
       cyk_table[row_nr][cell_nr] = []      
 
-      # Aizpilda pirmo rindu
+      # Fill in first row
       if row_nr == 0
         cyk_table[0][cell_nr] = grammar[string[cell_nr].to_sym] if grammar[string[cell_nr].to_sym]
         cyk_table[0][cell_nr] = cyk_table[0][cell_nr].flatten
       end
 
-      # Aizpila otro rindu, ja tāda eksistē
+      # Fill in second row if it exists
       if row_nr == 1
-        # Apskata visas iespējas, kā var iegūt attiecīgās tabulas šūnas vārdu
         cyk_table[0][cell_nr].each do |array_1_element|
           cyk_table[0][cell_nr + 1].each do |array_2_element|
             substring = array_1_element.to_s + array_2_element.to_s
@@ -89,12 +88,10 @@ class Parser
         end
       end
 
-      # Aizpilda visas rindas
+      # Fill all rows
       if row_nr > 1
-        # Apskata visus iespējamos variantus, kā var iegūt vārdu. Iespēju skaits ir rindas numurs.
         for i in 0..(row_nr - 1)
           if cyk_table[i][cell_nr] && cyk_table[row_nr - (i + 1)][cell_nr + (i + 1)]
-            # Apskata katra varianta, piemēram aaaab = aa + aab visus variantus kā iegūt aa un kā iegūt aab, un pārbauda, vai tādā veidā var iegūt aaaab. Ja var, tad ieraksta tabulā Neterminālos simbolus, no kuriem var izvest
             cyk_table[i][cell_nr].each do |array_1_element|
               cyk_table[row_nr - (i + 1)][cell_nr + (i + 1)].each do |array_2_element|
                 substring = array_1_element.to_s + array_2_element.to_s
@@ -105,12 +102,11 @@ class Parser
         end
       end
 
-      # Iterācijas beigās laukā, ja iespējamo produkciju masīvs sastāv no vairākiem masīviem, tad to saturus apvieno vienā masīvā
       cyk_table[row_nr][cell_nr] = cyk_table[row_nr][cell_nr].flatten if cyk_table[row_nr][cell_nr]
     end
   end
 
-  # CYK algoritma radītās tabulas izdrukāšana
+  # show CYK algorhytm table to user
   puts "\n"
   cyk_table.each do |row|
     row_output = row.to_s
@@ -120,10 +116,10 @@ class Parser
   end
   puts "\n"
 
-  # Rezultāta paziņošana
+  # Output result
   if cyk_table[string.length - 1][0] && cyk_table[string.length - 1][0][0].to_s == start_symbol
-    puts "Vārds PIEDER valodai!"
+    puts "Word BELONGS to grammar!"
   else
-    puts "Vārds NEPIEDER valodai!"
+    puts "Word DOES NOT BELONG to grammar!"
   end
 end
