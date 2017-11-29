@@ -69,6 +69,9 @@ class Parser
   # CYK Algoritma izveide
   cyk_table.each_with_index do |row, row_nr|
     row.each_with_index do |cell, cell_nr|
+      # Katra tabulas rūtiņa ir masīvs
+      cyk_table[row_nr][cell_nr] = []      
+
       # Aizpilda pirmo rindu
       if row_nr == 0
         cyk_table[0][cell_nr] = grammar[string[cell_nr].to_sym] if grammar[string[cell_nr].to_sym]
@@ -81,7 +84,7 @@ class Parser
         cyk_table[0][cell_nr].each do |array_1_element|
           cyk_table[0][cell_nr + 1].each do |array_2_element|
             substring = array_1_element.to_s + array_2_element.to_s
-            cyk_table[1][cell_nr] = grammar[substring.to_sym] if grammar[substring.to_sym]
+            cyk_table[1][cell_nr] << grammar[substring.to_sym] if grammar[substring.to_sym]
           end
         end
 
@@ -97,7 +100,7 @@ class Parser
             cyk_table[i][cell_nr].each do |array_1_element|
               cyk_table[row_nr - (i + 1)][cell_nr + (i + 1)].each do |array_2_element|
                 substring = array_1_element.to_s + array_2_element.to_s
-                cyk_table[row_nr][cell_nr] = grammar[substring.to_sym] if grammar[substring.to_sym]
+                cyk_table[row_nr][cell_nr] << grammar[substring.to_sym] if grammar[substring.to_sym]
               end
             end
           end
